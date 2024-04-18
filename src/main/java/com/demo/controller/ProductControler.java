@@ -1,5 +1,7 @@
 package com.demo.controller;
 
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -11,6 +13,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.demo.domain.product.Product;
 import com.demo.domain.product.ProductRepository;
 import com.demo.domain.product.RequestProduct;
+
+import jakarta.transaction.Transactional;
 
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -38,11 +42,17 @@ public class ProductControler {
   }
 
   @PutMapping("/{id}")
+  @Transactional
   public ResponseEntity<Product> updateProduct(@PathVariable String id, @RequestBody @Validated RequestProduct data) {
-    Product product = productRepository.getReferenceById(id);
-    product.setName(data.name());
-    product.setPrice_in_cents(data.priceInCents());
-    return ResponseEntity.ok(product);
+    Optional<Product> optionalProduct = productRepository.findById(id);
+    if (optionalProduct.isPresent()) {
+      Product product = optionalProduct.get();
+      product.setName(data.name());
+      product.setPrice_in_cents(data.priceInCents());
+      return ResponseEntity.ok(product);
+    } else {
+      return null;
+    }
   }
 
 }
