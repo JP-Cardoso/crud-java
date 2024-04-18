@@ -31,7 +31,7 @@ public class ProductControler {
   @SuppressWarnings("rawtypes")
   @GetMapping
   public ResponseEntity getAllProduct() {
-    var allProducts = productRepository.findAll();
+    var allProducts = productRepository.findAllByActiveTrue();
     return ResponseEntity.ok(allProducts);
   }
 
@@ -58,9 +58,16 @@ public class ProductControler {
 
   @SuppressWarnings("rawtypes")
   @DeleteMapping("/{id}")
+  @Transactional
   public ResponseEntity deleteProductById(@PathVariable String id) {
-    productRepository.deleteById(id);
-    return ResponseEntity.noContent().build();
+    Optional<Product> optionalProduct = productRepository.findById(id);
+    if (optionalProduct.isPresent()) {
+      Product product = optionalProduct.get();
+      product.setActive(false);
+      return ResponseEntity.noContent().build();
+    } else {
+      return ResponseEntity.notFound().build();
+    }
   }
 
 }
