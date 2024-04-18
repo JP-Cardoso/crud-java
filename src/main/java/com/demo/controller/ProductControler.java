@@ -5,6 +5,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -51,8 +52,15 @@ public class ProductControler {
       product.setPrice_in_cents(data.priceInCents());
       return ResponseEntity.ok(product);
     } else {
-      return null;
+      return ResponseEntity.notFound().build();
     }
+  }
+
+  @SuppressWarnings("rawtypes")
+  @DeleteMapping("/{id}")
+  public ResponseEntity deleteProductById(@PathVariable String id) {
+    productRepository.deleteById(id);
+    return ResponseEntity.noContent().build();
   }
 
 }
